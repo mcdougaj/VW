@@ -46,10 +46,10 @@ const Reveal: React.FC<{ l: ListingProps }> = ({ l }) => {
   const words = [`${l.year}`, l.model.toUpperCase(), l.trim.toUpperCase()];
   return (
     <AbsoluteFill style={{ transform: `translateX(${inn * 1080}px)`, filter: `blur(${inn * 30}px)` }}>
-      <PhotoSlot src={l.photos[0]} label="exterior 3/4 front" from={0} dur={135} zoom={[1.18, 1.05]} drift={[40, -40]} />
+      <PhotoSlot src={l.photos[0]} label="exterior 3/4 front" from={0} dur={135} zoom={[1.3, 1.16]} drift={[24, -24]} band bandY={560} />
       <LightSweep at={25} /><LightSweep at={95} dur={30} />
-      <AbsoluteFill style={{ background: "linear-gradient(180deg, transparent 50%, rgba(7,9,15,0.92) 82%)" }} />
-      <div style={{ position: "absolute", left: 80, right: 80, top: 1000 }}>
+      <AbsoluteFill style={{ background: "linear-gradient(180deg, transparent 46%, rgba(7,9,15,0.92) 72%)" }} />
+      <div style={{ position: "absolute", left: 80, right: 80, top: 930 }}>
         {words.map((w, i) => {
           const p = slam(f, 15 + i * BEAT);
           return (
@@ -244,7 +244,7 @@ const EndCard: React.FC<{ l: ListingProps }> = ({ l }) => {
       }}>
         Savings shown are off MSRP as listed on midlandsvw.com as of {l.asOf} for stock #{l.stock} (VIN {l.vin}).
         Total savings = {l.discounts.map((d) => `${d.label} ${usd(d.amount)}`).join(" + ")}.{qual} Retail Customer
-        Bonus subject to program terms and end dates. Excludes tax, tag, title and dealer fees. Subject to prior
+        Bonus subject to program terms{l.bonusEnds ? `; ends ${l.bonusEnds}` : " and end dates"}. Excludes tax, tag, title and dealer fees. Subject to prior
         sale. See dealer for complete details.
       </div>
     </AbsoluteFill>

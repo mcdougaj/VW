@@ -6,10 +6,12 @@ import { clamp } from "./motion";
 
 // Photo layer with slow push + drift. Without a real photo it renders a clearly
 // labelled placeholder so nobody mistakes the pilot for a finished ad.
+// band: listing photos are 4:3 (640x480), so "cover" in 9:16 crops away the ends of the car.
+// band = blurred cover backdrop + the sharp photo at full width, centred on y=bandY.
 export const PhotoSlot: React.FC<{
   src?: string; label: string; from: number; dur: number;
-  zoom?: [number, number]; drift?: [number, number]; blur?: number;
-}> = ({ src, label, from, dur, zoom = [1.08, 1.2], drift = [-30, 30], blur = 0 }) => {
+  zoom?: [number, number]; drift?: [number, number]; blur?: number; band?: boolean; bandY?: number;
+}> = ({ src, label, from, dur, zoom = [1.08, 1.2], drift = [-30, 30], blur = 0, band = false, bandY = 600 }) => {
   const f = useCurrentFrame();
   const p = interpolate(f, [from, from + dur], [0, 1], clamp);
   const s = zoom[0] + (zoom[1] - zoom[0]) * p;
@@ -18,6 +20,20 @@ export const PhotoSlot: React.FC<{
     width: "100%", height: "100%", objectFit: "cover",
     transform: `translateX(${x}px) scale(${s})`, filter: blur ? `blur(${blur}px)` : undefined,
   };
+  if (src && band) {
+    const h = 1080 * 0.75;
+    return (
+      <AbsoluteFill>
+        <Img src={staticFile(src)} style={{ ...style, transform: "scale(1.15)", filter: "blur(40px) brightness(0.45) saturate(1.2)" }} />
+        <Img src={staticFile(src)} style={{
+          position: "absolute", left: 0, top: bandY - h / 2, width: 1080, height: h,
+          transform: `translateX(${x}px) scale(${s})`, transformOrigin: "50% 50%",
+          maskImage: "linear-gradient(180deg, transparent 0%, #000 9%, #000 91%, transparent 100%)",
+          WebkitMaskImage: "linear-gradient(180deg, transparent 0%, #000 9%, #000 91%, transparent 100%)",
+        }} />
+      </AbsoluteFill>
+    );
+  }
   if (src) return <AbsoluteFill><Img src={staticFile(src)} style={style} /></AbsoluteFill>;
   return (
     <AbsoluteFill style={{ background: `radial-gradient(120% 80% at 50% 45%, #2a3245 0%, ${C.bg2} 45%, ${C.bg} 100%)` }}>

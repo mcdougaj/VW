@@ -51,7 +51,7 @@ Each listing shows the lines **MSRP, Dealer Discounts, Retail Customer Bonus, Ad
 | 12 | 2026 Jetta 1.5T Sport | 3VWBW7BU3TM038837 | $686 | $2,000 | **$2,686** | Military/FR $500 · College Grad $1,000 |
 
 All 12 passed the integrity check on 2026-10-29. Full rows are in `vw_listings.json`.
-Not yet confirmed: Retail Customer Bonus end date; whether the eligibility bonuses stack. The College Grad program runs to Jan 4, 2027 per the dealer's own page.
+Retail Customer Bonus end date: the Atlas Peak listing says "Exp. 11/02/2026" (checked 2026-10-29); confirm per car, since it goes on the end card as `bonusEnds`. Not yet confirmed: whether the eligibility bonuses stack. The College Grad program runs to Jan 4, 2027 per the dealer's own page.
 
 ---
 
@@ -120,7 +120,7 @@ npx tsc -p .                          (must print nothing)
 node tools/fetch_photos.mjs           -> public/atlas-peak-539843/01..22.webp
 ```
 - Make a contact sheet and pick: **hero** (best front 3/4) and **interior** (dash/seats showing the orange stitching). Optional third: cargo or 3rd row.
-- Set `photos: ["atlas-peak-539843/NN.webp", "atlas-peak-539843/NN.webp"]` in `src/data.ts`. Photo 12 is currently an unverified guess for the interior.
+- Set `photos: ["atlas-peak-539843/NN.webp", "atlas-peak-539843/NN.webp"]` in `src/data.ts`. Atlas Peak: 02 = hero (01 has the dealer banner burned in), 08 = interior with orange stitching. Listing photos are only 640x480, so the Reveal uses `PhotoSlot band` (full-width sharp photo over a blurred fill) instead of a 9:16 cover crop. Review stills: `node tools/stills.mjs <id> 20,100,250,590,800`.
 
 ### Step 3: Headshot
 Put the photo at `public/joey.jpg` and add `headshot: "joey.jpg"` to the listing in `data.ts`.
