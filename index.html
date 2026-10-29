@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <!-- Visitor safety: only this site's own files can load or run. No third-party scripts, fonts,
+       trackers, cookies or forms. The host repeats these rules as HTTP headers (.htaccess / _headers). -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; connect-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; upgrade-insecure-requests">
+  <meta name="referrer" content="no-referrer">
+  <title>Ask for Joey · New Volkswagens at Midlands VW</title>
+  <meta name="description" content="Drive the lot: new Volkswagens at Midlands Volkswagen of Columbia with their current discounts off MSRP, a short video and a link to each car's listing. Ask for Joey McDougal, Sales Manager.">
+  <meta name="theme-color" content="#05080f">
+  <link rel="stylesheet" href="css/site.css">
+  <link rel="preload" href="fonts/space-grotesk-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <canvas id="stage" aria-hidden="true"></canvas>
+  <div class="scrim" aria-hidden="true"></div>
+
+  <div id="loader" aria-hidden="true">
+    <div class="loader-inner">
+      <p class="loader-mark">ask for <i>joey</i></p>
+      <div class="loader-bar"><i id="loader-fill"></i></div>
+      <p class="loader-text"><span id="loader-count">0 / 0</span> · OPENING THE LOT</p>
+    </div>
+  </div>
+
+  <header class="top">
+    <a class="brand" href="#home">ask for <i>joey</i><small>MIDLANDS VOLKSWAGEN OF COLUMBIA</small></a>
+    <nav aria-label="Main">
+      <a class="nav-link" href="#lot">The lot</a>
+      <a class="nav-link" href="#visit">Visit</a>
+      <a class="nav-cta" href="tel:+18034045150"><span class="long">Call 803-404-5150</span><span class="short">Call Joey</span></a>
+    </nav>
+  </header>
+
+  <div class="hotspots" id="hotspots"></div>
+  <div class="pick-label" id="pick-label" aria-hidden="true"></div>
+
+  <main id="main">
+    <section class="chapter" id="home" data-stop="home" aria-labelledby="home-h">
+      <p class="eyebrow">JOEY McDOUGAL · SALES MANAGER</p>
+      <h1 id="home-h"><span class="line">Real cars.</span><span class="line">Real savings.</span></h1>
+      <p class="lede" id="home-lede"></p>
+      <div class="actions">
+        <button class="btn" type="button" data-go="next">Start the drive</button>
+      </div>
+      <p class="note">SCROLL, SWIPE OR USE THE ARROW KEYS. TAP A CAR FOR ITS VIDEO.</p>
+    </section>
+
+    <div id="lot"></div>
+
+    <section class="chapter" id="visit" data-stop="visit" aria-labelledby="visit-h">
+      <p class="eyebrow">COME SEE THEM IN PERSON</p>
+      <div class="joey">
+        <img src="img/joey.jpg" alt="Joey McDougal" width="96" height="96">
+        <div><strong>Joey McDougal</strong><span>Sales Manager · Midlands Volkswagen of Columbia</span></div>
+      </div>
+      <h2 id="visit-h"><span class="line">Ask for Joey.</span></h2>
+      <p class="lede">655 Broad River Road, Columbia, SC 29210. Tell me which car you saw here and I will have it pulled up front.</p>
+      <div class="actions">
+        <a class="btn" href="tel:+18034045150">Call 803-404-5150</a>
+        <a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=655+Broad+River+Road+Columbia+SC+29210" target="_blank" rel="noopener noreferrer">Directions</a>
+      </div>
+      <p class="note" id="visit-note"></p>
+    </section>
+  </main>
+
+  <nav class="carousel" id="carousel" aria-label="Cars on the lot">
+    <button class="car-nav prev" type="button" aria-label="Previous car">‹</button>
+    <ol class="car-strip" id="car-strip"></ol>
+    <button class="car-nav next" type="button" aria-label="Next car">›</button>
+  </nav>
+
+  <aside class="detail" id="detail" aria-labelledby="detail-h" hidden>
+    <button class="detail-close" id="detail-close" type="button">Close</button>
+    <p class="eyebrow" id="detail-eyebrow"></p>
+    <h2 id="detail-h"></h2>
+    <div class="detail-media" id="detail-media"></div>
+    <div class="gallery" id="detail-gallery"></div>
+    <h3>Savings off MSRP</h3>
+    <div class="stack" id="detail-stack"></div>
+    <div id="detail-qualify"></div>
+    <h3>Highlights</h3>
+    <ul class="spec" id="detail-spec"></ul>
+    <div class="actions">
+      <a class="btn" id="detail-listing" target="_blank" rel="noopener noreferrer">See this car on midlandsvw.com</a>
+      <a class="btn ghost" href="tel:+18034045150">Call Joey</a>
+    </div>
+    <p class="fine" id="detail-fine"></p>
+  </aside>
+
+  <dialog class="viewer" id="viewer" aria-label="Photo">
+    <button class="detail-close" id="viewer-close" type="button">Close</button>
+    <img id="viewer-img" alt="">
+  </dialog>
+
+  <div class="hud" aria-hidden="true">
+    <span id="hud-label">01 / THE LOT</span>
+    <span class="hud-hint">SCROLL TO DRIVE</span>
+    <div class="hud-bar"><i id="hud-fill"></i></div>
+  </div>
+
+  <script src="data/cars.js"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
