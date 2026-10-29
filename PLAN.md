@@ -206,3 +206,16 @@ Add a batch script once the template is final (`tools/render_all.mjs`) to render
   - The real voiceover and the caption timing re-sync to it.
   - Review of the caption-band layout with the real photos.
   - The other 11 cars.
+
+---
+
+## 10. Showroom site (`site/`, added 2026-10-29)
+
+A scroll-driven 3D night lot in the style of joeyi.org: one lit display bay per car showing its **real listing photo**, a floating savings tag, a carousel of all cars, and a detail panel with the video (or "video coming soon"), photo gallery, savings stack, "if you qualify", highlights and a button to the car's own listing on midlandsvw.com. Static files only, no build step.
+
+- Data: `data/listings.source.json` (read from each live listing; holds MSRP/Your Price ONLY for the integrity check, kept outside `site/` so it never deploys).
+- Build: `node tools/build_site.mjs` (integrity check, downloads photos to `site/cars/`, copies `out/<id>.mp4` + a poster frame to `site/video/`, writes `site/data/cars.js` with discounts only).
+- Guard: `node tools/check_site.mjs` must pass before every upload (no price figures, no third-party code, no injection sinks, safe external links, CSP present).
+- Visitor safety: CSP meta (`script-src 'self'`, nothing external), plus the same CSP, HSTS, nosniff, frame DENY, no-referrer and a locked-down Permissions-Policy as host headers in `site/.htaccess` (Apache) and `site/_headers` (Netlify/Cloudflare). Three.js and fonts are vendored; no cookies, storage, forms, trackers or analytics.
+- Preview: launch config `vw-lot-site` (python http.server on 127.0.0.1:8361). `?static` shows the no-3D page, `?debug` exposes `window.__lot` for checks.
+- Adding a car: add it to `data/listings.source.json` (or render its video to `out/<id>.mp4`), run the two scripts. The lot grows a bay automatically.
