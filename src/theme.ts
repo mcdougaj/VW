@@ -1,6 +1,10 @@
-import { loadFont } from "@remotion/google-fonts/Inter";
-// Inter Display if installed locally, otherwise Inter from Google Fonts.
-const { fontFamily } = loadFont("normal", { weights: ["500", "600", "700", "800", "900"], subsets: ["latin"] });
+// Inter bundled from npm (@fontsource) so renders work offline on any machine.
+import "@fontsource/inter/500.css";
+import "@fontsource/inter/600.css";
+import "@fontsource/inter/700.css";
+import "@fontsource/inter/800.css";
+import "@fontsource/inter/900.css";
+
 export const C = {
   bg: "#07090F",
   bg2: "#111827",
@@ -10,7 +14,7 @@ export const C = {
   accent2: "#FFB347",
   line: "rgba(255,255,255,0.14)",
 };
-export const FONT = `'Inter Display', ${fontFamily}, sans-serif`;
+export const FONT = "'Inter Display', 'Inter', sans-serif";
 export const FPS = 30;
 export const BEAT = 15; // 120 BPM
 // Scene boundaries (frames). Every one lands on a beat.

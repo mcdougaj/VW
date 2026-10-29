@@ -14,6 +14,7 @@ export type ListingProps = {
   features: string[];
   photos: string[];       // files under public/; empty -> marked placeholder slot
   headshot?: string;
+  captions: boolean;      // false -> clean render for captioning in DaVinci Resolve
   salesperson: string;
   title: string;
   phone: string;
@@ -25,6 +26,7 @@ const common = {
   title: "Sales Manager",
   phone: "803-404-5150",
   asOf: "10/29/26",
+  captions: true,
 };
 
 export const listings: ListingProps[] = [
