@@ -1,0 +1,14 @@
+{
+  "name": "vw-sales-videos",
+  "private": true,
+  "scripts": { "studio": "remotion studio", "tsc": "tsc -p ." },
+  "dependencies": {
+    "remotion": "4.0.409",
+    "@remotion/cli": "4.0.409",
+    "@remotion/google-fonts": "4.0.409",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "qrcode": "1.5.4"
+  },
+  "devDependencies": { "typescript": "5.9.3", "@types/react": "19.2.7", "@types/qrcode": "1.5.5" }
+}

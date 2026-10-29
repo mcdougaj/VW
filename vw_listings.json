@@ -1,0 +1,145 @@
+{
+ "pulled": "2026-10-29",
+ "source": "midlandsvw.com/new-vehicles (pages 1-4)",
+ "rule": "No prices on screen. Discounts and bonuses only.",
+ "salesperson": "Joey McDougal",
+ "dealer": {
+  "name": "Midlands Volkswagen of Columbia",
+  "address": "655 Broad River Road, Columbia, SC 29210",
+  "sales": "803-404-5150"
+ },
+ "listings": [
+  {
+   "n": 1,
+   "vin": "1V2CN2CA3TC539843",
+   "title": "2026 Volkswagen Atlas Peak Edition AWD",
+   "interior": "Titan Black Leatherette",
+   "dealerDiscount": 1615,
+   "retailCustomerBonus": 5000,
+   "totalSavings": 6615,
+   "militaryFirstResponder": 500,
+   "collegeGrad": 0
+  },
+  {
+   "n": 2,
+   "vin": "1V2JN2CA8TC590469",
+   "title": "2026 Volkswagen Atlas SE w/Technology",
+   "interior": "Titan Black Leatherette",
+   "dealerDiscount": 976,
+   "retailCustomerBonus": 5000,
+   "totalSavings": 5976,
+   "militaryFirstResponder": 500,
+   "collegeGrad": 0
+  },
+  {
+   "n": 3,
+   "vin": "1V2FN2CA7TC533072",
+   "title": "2026 Volkswagen Atlas SEL Premium R-Line With Navigation & AWD",
+   "interior": "French Roast Leather",
+   "dealerDiscount": 1463,
+   "retailCustomerBonus": 4500,
+   "totalSavings": 5963,
+   "militaryFirstResponder": 500,
+   "collegeGrad": 0
+  },
+  {
+   "n": 4,
+   "vin": "1V2BN2CA7TC545432",
+   "title": "2026 Volkswagen Atlas SEL With Navigation & AWD",
+   "interior": "Mauve Brown Leather",
+   "dealerDiscount": 1346,
+   "retailCustomerBonus": 4500,
+   "totalSavings": 5846,
+   "militaryFirstResponder": 500,
+   "collegeGrad": 0
+  },
+  {
+   "n": 5,
+   "vin": "1V2BC2CA3TC219083",
+   "title": "2026 Volkswagen Atlas Cross Sport SEL With Navigation & AWD",
+   "interior": "Soul Black Nappa Leather",
+   "dealerDiscount": 1297,
+   "retailCustomerBonus": 3750,
+   "totalSavings": 5047,
+   "militaryFirstResponder": 500,
+   "collegeGrad": 0
+  },
+  {
+   "n": 6,
+   "vin": "1V2AC2CA6TC232843",
+   "title": "2026 Volkswagen Atlas Cross Sport SEL R-Line Black With Navigation & AWD",
+   "interior": "Shetland Beige / Black Leatherette",
+   "dealerDiscount": 851,
+   "retailCustomerBonus": 3750,
+   "totalSavings": 4601,
+   "militaryFirstResponder": 500,
+   "collegeGrad": 0
+  },
+  {
+   "n": 7,
+   "vin": "1V2WC2CA1TC244176",
+   "title": "2026 Volkswagen Atlas Cross Sport SE w/Technology",
+   "interior": "Titan Black Leatherette",
+   "dealerDiscount": 550,
+   "retailCustomerBonus": 4000,
+   "totalSavings": 4550,
+   "militaryFirstResponder": 500,
+   "collegeGrad": 0
+  },
+  {
+   "n": 8,
+   "vin": "1V2H53DH8VC501647",
+   "title": "2027 Volkswagen Atlas SE w/Technology",
+   "interior": "Titan Black Leatherette",
+   "dealerDiscount": 500,
+   "retailCustomerBonus": 1000,
+   "totalSavings": 1500,
+   "militaryFirstResponder": 0,
+   "collegeGrad": 0
+  },
+  {
+   "n": 9,
+   "vin": "3VVBR7RM7TM032086",
+   "title": "2026 Volkswagen Tiguan S AWD",
+   "interior": "Titan Black Cloth",
+   "dealerDiscount": 753,
+   "retailCustomerBonus": 3000,
+   "totalSavings": 3753,
+   "militaryFirstResponder": 500,
+   "collegeGrad": 500
+  },
+  {
+   "n": 10,
+   "vin": "3VVGR7RMXTM135217",
+   "title": "2026 Volkswagen Tiguan SE R-Line Black AWD",
+   "interior": "Cinnamon Brown Leatherette",
+   "dealerDiscount": 575,
+   "retailCustomerBonus": 3000,
+   "totalSavings": 3575,
+   "militaryFirstResponder": 500,
+   "collegeGrad": 500
+  },
+  {
+   "n": 11,
+   "vin": "3VVFR7RM8TM135499",
+   "title": "2026 Volkswagen Tiguan SE",
+   "interior": "Cinnamon Brown Leatherette",
+   "dealerDiscount": 534,
+   "retailCustomerBonus": 3000,
+   "totalSavings": 3534,
+   "militaryFirstResponder": 500,
+   "collegeGrad": 500
+  },
+  {
+   "n": 12,
+   "vin": "3VWBW7BU3TM038837",
+   "title": "2026 Volkswagen Jetta 1.5T Sport",
+   "interior": "Titan Black Leatherette",
+   "dealerDiscount": 686,
+   "retailCustomerBonus": 2000,
+   "totalSavings": 2686,
+   "militaryFirstResponder": 500,
+   "collegeGrad": 1000
+  }
+ ]
+}
