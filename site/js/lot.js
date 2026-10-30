@@ -1,11 +1,14 @@
 import * as THREE from '../vendor/three/build/three.module.min.js';
-import { CARS, STOPS, BAY_Z, bayX, SHOWROOM_X, usd } from './stops.js';
+import { CARS, STOPS, BAY_Z, BAY_GAP, bayX, SHOWROOM_X, usd } from './stops.js';
 
-// The night lot: wet asphalt, a road, one display bay per car (its REAL listing photo on a lit
-// panel, never a drawn car), light poles with haze cones, an entrance gate and the showroom.
+// The dealership lot at night: a front display row of parking stalls, each holding the REAL car cut out
+// of its own listing photo (tools/cutout_cars.py; never a drawn car), tall LED pole lights with light
+// pools, pennant strings, a landscaped curb with palmettos, the entrance gate and the showroom.
 const ACCENT = new THREE.Color('#ff6a1a');
-const SODIUM = new THREE.Color('#ffb45a');
+const LED = new THREE.Color('#e9f1ff');
 const FONT = (w, px, fam = 'Space Grotesk') => `${w} ${px}px "${fam}"`;
+const CAR_H = { 'Atlas': 1.95, 'Atlas Cross Sport': 1.9, 'Tiguan': 1.8, 'Jetta': 1.62 };
+const POLE_Z = BAY_Z - 4.6;
 
 function canvasTex(w, h, draw) {
   const c = document.createElement('canvas');
@@ -17,45 +20,41 @@ function canvasTex(w, h, draw) {
   return t;
 }
 const glow = (color, k = 1) => new THREE.MeshBasicMaterial({ color: color.clone().multiplyScalar(k), toneMapped: false });
+const radial = (inner, outer) => canvasTex(256, 256, (g) => {
+  const r = g.createRadialGradient(128, 128, 0, 128, 128, 128);
+  r.addColorStop(0, inner); r.addColorStop(1, outer);
+  g.fillStyle = r; g.fillRect(0, 0, 256, 256);
+});
 
 function asphalt() {
   return canvasTex(512, 512, (g, w, h) => {
-    g.fillStyle = '#0d121b'; g.fillRect(0, 0, w, h);
+    g.fillStyle = '#10151e'; g.fillRect(0, 0, w, h);
     for (let i = 0; i < 9000; i++) {
-      const v = 14 + Math.random() * 22;
+      const v = 16 + Math.random() * 26;
       g.fillStyle = `rgba(${v},${v + 3},${v + 9},${0.35 + Math.random() * 0.4})`;
       g.fillRect(Math.random() * w, Math.random() * h, 1.6, 1.6);
     }
   });
 }
 
-// Light cone: additive, fades toward the floor and the rim.
-function hazeMaterial(color) {
+// Light cone: additive, fades toward the floor and the rim. Inputs clamped: pow(0, x) is NaN on D3D
+// and the bloom blur spreads NaN into black squares.
+function hazeMaterial(color, k = 0.12) {
   return new THREE.ShaderMaterial({
     transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
-    uniforms: { uColor: { value: color }, uK: { value: 0.16 } },
+    uniforms: { uColor: { value: color }, uK: { value: k } },
     vertexShader: 'varying vec2 vUv; varying vec3 vN; varying vec3 vV; void main(){ vUv = uv; vec4 mv = modelViewMatrix * vec4(position,1.); vN = normalize(normalMatrix * normal); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }',
     fragmentShader: 'uniform vec3 uColor; uniform float uK; varying vec2 vUv; varying vec3 vN; varying vec3 vV; void main(){ float rim = pow(clamp(abs(dot(normalize(vN), normalize(vV))), 1e-3, 1.), 1.6); float a = clamp(uK * rim * pow(clamp(vUv.y, 1e-3, 1.), 1.4), 0., 1.); gl_FragColor = vec4(uColor * a, a); }',
   });
 }
 
 function savingsTag(car) {
-  return canvasTex(1024, 360, (g, w, h) => {
+  return canvasTex(1024, 420, (g, w) => {
     g.textAlign = 'center';
-    g.fillStyle = '#ffb347'; g.font = FONT(500, 46, 'JetBrains Mono'); g.fillText('S A V E', w / 2, 62);
-    g.fillStyle = '#ffffff'; g.font = FONT(700, 196); g.fillText(usd(car.total), w / 2, 248);
-    g.fillStyle = '#ff6a1a'; g.font = FONT(500, 46, 'JetBrains Mono'); g.fillText('O F F   M S R P', w / 2, 330);
-  });
-}
-
-function namePlate(car, n) {
-  return canvasTex(1600, 96, (g, w, h) => {
-    g.fillStyle = '#0a0f18'; g.fillRect(0, 0, w, h);
-    g.fillStyle = '#ff6a1a'; g.fillRect(0, 0, 10, h);
-    g.textBaseline = 'middle';
-    g.fillStyle = '#ff6a1a'; g.font = FONT(700, 44, 'JetBrains Mono'); g.fillText(String(n).padStart(2, '0'), 40, h / 2);
-    g.fillStyle = '#eef3fa'; g.font = FONT(600, 50); g.fillText(`${car.year} ${car.model} ${car.trim}`.toUpperCase(), 130, h / 2 + 2);
-    g.textAlign = 'right'; g.fillStyle = '#a4b3c7'; g.font = FONT(500, 34, 'JetBrains Mono'); g.fillText(`STOCK ${car.stock}`, w - 36, h / 2);
+    g.fillStyle = '#ffb347'; g.font = FONT(500, 44, 'JetBrains Mono'); g.fillText('S A V E', w / 2, 56);
+    g.fillStyle = '#ffffff'; g.font = FONT(700, 190); g.fillText(usd(car.total), w / 2, 232);
+    g.fillStyle = '#ff6a1a'; g.font = FONT(500, 44, 'JetBrains Mono'); g.fillText('O F F   M S R P', w / 2, 300);
+    g.fillStyle = '#d3dceb'; g.font = FONT(600, 46); g.fillText(`${car.year} ${car.model} ${car.trim}`.toUpperCase(), w / 2, 384);
   });
 }
 
@@ -68,87 +67,188 @@ function signTex(lines, w = 2048, h = 360) {
   });
 }
 
-function buildBay(i, car, tex, metal, haze) {
+function buildStall(i, car, cutTex, shadowTex, poolTex) {
   const x = bayX(i);
-  const bay = new THREE.Group();
-  bay.position.set(x, 0, BAY_Z);
-  bay.rotation.y = -0.06;
+  const g = new THREE.Group();
+  g.position.set(x, 0, BAY_Z);
 
-  const W = 8, H = 6, CY = 4.1;
-  const plinth = new THREE.Mesh(new THREE.BoxGeometry(9.4, 0.5, 3), metal);
-  plinth.position.y = 0.25;
-  bay.add(plinth);
-  const plate = new THREE.Mesh(new THREE.PlaneGeometry(9.2, 0.55), new THREE.MeshBasicMaterial({ map: namePlate(car, i + 1), toneMapped: false, color: 0xcccccc }));
-  plate.position.set(0, 0.26, 1.51);
-  bay.add(plate);
-  const sill = new THREE.Mesh(new THREE.BoxGeometry(9.4, 0.05, 0.06), glow(ACCENT, 2.2));
-  sill.position.set(0, 0.52, 1.5);
-  bay.add(sill);
+  const H = CAR_H[car.model] || 1.85;
+  const W = H * (cutTex.image.width / cutTex.image.height);
+  const carMat = new THREE.MeshBasicMaterial({ map: cutTex, transparent: true, alphaTest: 0.3, toneMapped: false, color: 0xb9bdc8 });
+  const carMesh = new THREE.Mesh(new THREE.PlaneGeometry(W, H), carMat);
+  carMesh.position.y = H / 2;
+  carMesh.userData.stop = i + 1;
+  carMesh.renderOrder = 2;
+  g.add(carMesh);
 
-  const frame = new THREE.Mesh(new THREE.BoxGeometry(W + 0.5, H + 0.5, 0.3), metal);
-  frame.position.set(0, CY, -0.2);
-  bay.add(frame);
-  [-2.6, 2.6].forEach((lx) => {
-    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.22, CY - H / 2, 0.22), metal);
-    leg.position.set(lx, (CY - H / 2) / 2 + 0.25, -0.2);
-    bay.add(leg);
-  });
+  // wet-asphalt reflection (the ground is slightly see-through) and a soft contact shadow
+  const refl = new THREE.Mesh(carMesh.geometry, new THREE.MeshBasicMaterial({ map: cutTex, transparent: true, alphaTest: 0.3, toneMapped: false, color: 0x3a3f4c }));
+  refl.scale.y = -1;
+  refl.position.y = -H / 2;
+  g.add(refl);
+  const shadow = new THREE.Mesh(new THREE.PlaneGeometry(W * 1.02, 3.2), new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false }));
+  shadow.rotation.x = -Math.PI / 2;
+  shadow.position.set(0, 0.02, 0.1);
+  g.add(shadow);
+  // the stall's own light pool
+  const pool = new THREE.Mesh(new THREE.PlaneGeometry(BAY_GAP * 1.6, 10), new THREE.MeshBasicMaterial({ map: poolTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false }));
+  pool.rotation.x = -Math.PI / 2;
+  pool.position.set(0, 0.015, 0.4);
+  g.add(pool);
 
-  const photoMat = new THREE.MeshBasicMaterial({ map: tex, toneMapped: false, color: 0xd2d2d2 });
-  const photo = new THREE.Mesh(new THREE.PlaneGeometry(W, H), photoMat);
-  photo.position.set(0, CY, -0.04);
-  photo.userData.stop = i + 1;
-  bay.add(photo);
+  const tagMat = new THREE.MeshBasicMaterial({ map: savingsTag(car), transparent: true, toneMapped: false, depthWrite: false, opacity: 0.4 });
+  const tag = new THREE.Mesh(new THREE.PlaneGeometry(3.6, 1.48), tagMat);
+  tag.position.set(0, H + 1.25, 0.1);
+  g.add(tag);
+  const underline = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.035, 0.03), glow(ACCENT, 2));
+  underline.position.set(0, H + 0.42, 0.1);
+  g.add(underline);
 
-  const ledMat = glow(ACCENT, 1.6);
-  const leds = new THREE.Group();
-  [[0, H / 2 + 0.08, W + 0.3, 0.07], [0, -H / 2 - 0.08, W + 0.3, 0.07], [-W / 2 - 0.08, 0, 0.07, H + 0.3], [W / 2 + 0.08, 0, 0.07, H + 0.3]].forEach(([lx, ly, lw, lh]) => {
-    const m = new THREE.Mesh(new THREE.BoxGeometry(lw, lh, 0.05), ledMat);
-    m.position.set(lx, CY + ly, 0);
-    leds.add(m);
-  });
-  bay.add(leds);
-
-  // reflection in the wet asphalt (the ground is slightly see-through)
-  const mirror = new THREE.Group();
-  mirror.scale.y = -1;
-  const rPhoto = new THREE.Mesh(photo.geometry, new THREE.MeshBasicMaterial({ map: tex, toneMapped: false, color: 0x4a4a4a }));
-  rPhoto.position.copy(photo.position);
-  mirror.add(rPhoto, leds.clone());
-  bay.add(mirror);
-
-  const tagMat = new THREE.MeshBasicMaterial({ map: savingsTag(car), transparent: true, toneMapped: false, depthWrite: false });
-  const tag = new THREE.Mesh(new THREE.PlaneGeometry(5.2, 1.83), tagMat);
-  tag.position.set(0, CY + H / 2 + 1.55, 0.2);
-  bay.add(tag);
-
-  // light pole + haze cone
-  const pole = new THREE.Group();
-  pole.position.set(6.2, 0, 2.2);
-  const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.12, 9, 10), metal);
-  mast.position.y = 4.5;
-  const arm = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.12, 0.12), metal);
-  arm.position.set(-1.0, 9, 0);
-  const head = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.16, 0.5), glow(SODIUM, 2.4));
-  head.position.set(-1.9, 8.92, 0);
-  const cone = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 3.4, 8.8, 32, 1, true), haze);
-  cone.position.set(-1.9, 4.5, 0);
-  pole.add(mast, arm, head, cone);
-  bay.add(pole);
-
-  // parking stall lines on the ground in front of the bay
-  const lineMat = new THREE.MeshBasicMaterial({ color: 0x8792a6, transparent: true, opacity: 0.35 });
-  [-4.6, 4.6].forEach((lx) => {
-    const l = new THREE.Mesh(new THREE.PlaneGeometry(0.12, 5.5), lineMat);
-    l.rotation.x = -Math.PI / 2;
-    l.position.set(lx, 0.012, 5);
-    bay.add(l);
-  });
-
-  return { bay, photo, tag, ledMat, x, baseTagY: tag.position.y };
+  return { group: g, car: carMesh, carMat, poolMat: pool.material, tag, tagMat, underline, x, H, baseTagY: tag.position.y };
 }
 
-function buildGate(scene, metal, haze) {
+// Stall lines, curb stops and the landscaped island behind the row.
+function buildRowFurniture(scene, metal, concrete) {
+  const lineMat = new THREE.MeshBasicMaterial({ color: 0xdfe5ee, transparent: true, opacity: 0.55 });
+  const first = bayX(0) - BAY_GAP / 2, last = bayX(CARS.length - 1) + BAY_GAP / 2;
+  for (let x = first; x <= last + 0.01; x += BAY_GAP) {
+    const l = new THREE.Mesh(new THREE.PlaneGeometry(0.13, 6.2), lineMat);
+    l.rotation.x = -Math.PI / 2;
+    l.position.set(x, 0.012, BAY_Z + 0.2);
+    scene.add(l);
+  }
+  const back = new THREE.Mesh(new THREE.PlaneGeometry(last - first, 0.13), lineMat);
+  back.rotation.x = -Math.PI / 2;
+  back.position.set((first + last) / 2, 0.012, BAY_Z - 2.9);
+  scene.add(back);
+
+  const len = last - first + 30;
+  const curb = new THREE.Mesh(new THREE.BoxGeometry(len, 0.2, 3.2), concrete);
+  curb.position.set((first + last) / 2, 0.1, POLE_Z);
+  scene.add(curb);
+  const bed = new THREE.Mesh(new THREE.BoxGeometry(len - 0.4, 0.06, 2.8), new THREE.MeshStandardMaterial({ color: 0x14100c, roughness: 1 }));
+  bed.position.set(curb.position.x, 0.22, POLE_Z);
+  scene.add(bed);
+
+  const shrubGeo = new THREE.IcosahedronGeometry(0.6, 1);
+  const shrubMat = new THREE.MeshStandardMaterial({ color: 0x0f2414, roughness: 0.9, flatShading: true });
+  const n = Math.floor(len / 1.25);
+  const shrubs = new THREE.InstancedMesh(shrubGeo, shrubMat, n);
+  const m = new THREE.Matrix4(), q = new THREE.Quaternion(), s = new THREE.Vector3(), p = new THREE.Vector3();
+  for (let k = 0; k < n; k++) {
+    const sc = 0.7 + Math.random() * 0.5;
+    p.set(curb.position.x - len / 2 + 0.8 + k * 1.25, 0.45 * sc, POLE_Z + (Math.random() - 0.5) * 1.2);
+    s.set(sc * 1.2, sc * 0.75, sc);
+    q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.random() * 6);
+    shrubs.setMatrixAt(k, m.compose(p, q, s));
+  }
+  scene.add(shrubs);
+
+  // palmettos along the island (it's Columbia, SC)
+  const trunkMat = new THREE.MeshStandardMaterial({ color: 0x3a2d22, roughness: 1 });
+  const frondMat = new THREE.MeshStandardMaterial({ color: 0x12301a, roughness: 0.85, side: THREE.DoubleSide, flatShading: true });
+  const frondGeo = new THREE.ConeGeometry(0.42, 2.6, 4, 1);
+  frondGeo.translate(0, 1.3, 0);
+  for (let x = first + BAY_GAP * 1.5; x < last; x += BAY_GAP * 3) {
+    const tree = new THREE.Group();
+    tree.position.set(x, 0.2, POLE_Z - 0.4);
+    const h = 5.2 + Math.random() * 1.6;
+    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.24, h, 7), trunkMat);
+    trunk.position.y = h / 2;
+    tree.add(trunk);
+    for (let f = 0; f < 9; f++) {
+      const fr = new THREE.Mesh(frondGeo, frondMat);
+      fr.position.y = h;
+      fr.rotation.set(0, (f / 9) * Math.PI * 2, 1.15 + Math.random() * 0.35, 'YXZ');
+      fr.scale.set(1, 1, 0.18);
+      tree.add(fr);
+    }
+    scene.add(tree);
+  }
+}
+
+// Tall LED area lights: square pole, twin shoebox heads, haze cones and pools on the asphalt.
+function buildPoles(scene, metal, poolTex) {
+  const xs = [];
+  for (let x = bayX(0) - BAY_GAP / 2; x <= bayX(CARS.length - 1) + BAY_GAP / 2 + 0.01; x += BAY_GAP * 2) xs.push([x, POLE_Z]);
+  for (let x = 28; x < SHOWROOM_X - 10; x += 34) xs.push([x, 15]);   // far side of the road
+  const haze = hazeMaterial(LED.clone().multiplyScalar(0.85), 0.1);
+  const headMat = glow(LED, 3.2);
+  const poolMat = new THREE.MeshBasicMaterial({ map: poolTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false });
+  const tops = [];
+  xs.forEach(([x, z], k) => {
+    const pole = new THREE.Group();
+    pole.position.set(x, 0, z);
+    const mast = new THREE.Mesh(new THREE.BoxGeometry(0.2, 9.6, 0.2), metal);
+    mast.position.y = 4.8 + 0.2;
+    pole.add(mast);
+    const base = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.5, 0.6, 12), new THREE.MeshStandardMaterial({ color: 0x5e636d, roughness: 0.9 }));
+    base.position.y = 0.3;
+    pole.add(base);
+    [-1, 1].forEach((side) => {
+      const dir = z < 0 ? 1 : -1;   // heads lean over the lot
+      const arm = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 1.4), metal);
+      arm.position.set(side * 0.55, 9.75, dir * 0.6);
+      arm.rotation.y = side * 0.5;
+      const head = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.16, 0.95), metal);
+      head.position.set(side * 0.95, 9.72, dir * 1.15);
+      const lens = new THREE.Mesh(new THREE.PlaneGeometry(0.62, 0.8), headMat);
+      lens.rotation.x = Math.PI / 2;
+      lens.position.set(side * 0.95, 9.63, dir * 1.15);
+      const cone = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 4.6, 9.6, 28, 1, true), haze);
+      cone.position.set(side * 0.95 + side * 1.0, 4.85, dir * 2.2);
+      cone.rotation.z = -side * 0.2;
+      cone.rotation.x = dir * 0.22;
+      pole.add(arm, head, lens, cone);
+    });
+    const pool = new THREE.Mesh(new THREE.PlaneGeometry(17, 17), poolMat);
+    pool.rotation.x = -Math.PI / 2;
+    pool.position.set(0, 0.014, z < 0 ? 4 : -4);
+    pole.add(pool);
+    scene.add(pole);
+    if (z < 0) tops.push(new THREE.Vector3(x, 9.3, z));
+  });
+  return tops;
+}
+
+// Dealer pennant strings between the pole tops; they flutter.
+function buildPennants(scene, tops) {
+  const colors = ['#d7263d', '#f2f2f2', '#1f6feb', '#ff6a1a'].map((c) => new THREE.Color(c).multiplyScalar(0.8));
+  const tri = new THREE.BufferGeometry();
+  tri.setAttribute('position', new THREE.Float32BufferAttribute([-0.2, 0, 0, 0.2, 0, 0, 0, -0.55, 0], 3));
+  tri.computeVertexNormals();
+  const per = 16;
+  const count = (tops.length - 1) * per;
+  const flags = new THREE.InstancedMesh(tri, new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, toneMapped: false }), count);
+  const base = [];
+  const linePts = [];
+  for (let k = 0; k < tops.length - 1; k++) {
+    const a = tops[k], b = tops[k + 1];
+    for (let j = 0; j <= 24; j++) {
+      const t = j / 24;
+      linePts.push(new THREE.Vector3().lerpVectors(a, b, t).setY(a.y - Math.sin(t * Math.PI) * 1.1));
+    }
+    for (let j = 0; j < per; j++) {
+      const t = (j + 0.5) / per;
+      const p = new THREE.Vector3().lerpVectors(a, b, t);
+      p.y = a.y - Math.sin(t * Math.PI) * 1.1;
+      base.push(p);
+      flags.setColorAt(base.length - 1, colors[(base.length - 1) % colors.length]);
+    }
+  }
+  const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(linePts), new THREE.LineBasicMaterial({ color: 0x8a93a5 }));
+  scene.add(flags, line);
+  const m = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), one = new THREE.Vector3(1, 1, 1);
+  return (time) => {
+    base.forEach((p, i) => {
+      e.set(Math.sin(time * 2.4 + i * 0.9) * 0.45, 0, 0);
+      flags.setMatrixAt(i, m.compose(p, q.setFromEuler(e), one));
+    });
+    flags.instanceMatrix.needsUpdate = true;
+  };
+}
+
+function buildGate(scene, metal) {
   const g = new THREE.Group();
   g.position.set(12, 0, 2.5);
   [-6.8, 6.8].forEach((z) => {
@@ -178,11 +278,11 @@ function buildShowroom(scene, metal, joeyTex) {
     for (let x = 0; x < 8; x++) for (let y = 0; y < 2; y++) {
       const v = 0.55 + Math.random() * 0.45;
       const grd = c.createLinearGradient(0, y * 256, 0, y * 256 + 240);
-      grd.addColorStop(0, `rgba(255,220,170,${0.9 * v})`); grd.addColorStop(1, `rgba(140,180,255,${0.5 * v})`);
+      grd.addColorStop(0, `rgba(255,236,210,${0.95 * v})`); grd.addColorStop(1, `rgba(170,200,255,${0.6 * v})`);
       c.fillStyle = grd; c.fillRect(x * 128 + 8, y * 256 + 10, 112, 236);
     }
   });
-  const glass = new THREE.Mesh(new THREE.BoxGeometry(30, 9, 12), [metal, metal, metal, metal, new THREE.MeshBasicMaterial({ map: windows, toneMapped: false, color: 0xbfbfbf }), metal]);
+  const glass = new THREE.Mesh(new THREE.BoxGeometry(30, 9, 12), [metal, metal, metal, metal, new THREE.MeshBasicMaterial({ map: windows, toneMapped: false, color: 0xcfcfcf }), metal]);
   glass.position.y = 4.5;
   const fascia = new THREE.Mesh(new THREE.BoxGeometry(31, 1.6, 12.6), metal);
   fascia.position.y = 9.6;
@@ -193,7 +293,10 @@ function buildShowroom(scene, metal, joeyTex) {
     map: canvasTex(2048, 120, (c, w, h) => { c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillStyle = '#eef3fa'; c.font = FONT(600, 78); c.fillText('MIDLANDS VOLKSWAGEN OF COLUMBIA', w / 2, h / 2); }),
   }));
   name.position.set(0, 9.6, 6.32);
-  // Joey's board beside the door
+  // light spilling out of the showroom onto the lot
+  const spill = new THREE.Mesh(new THREE.PlaneGeometry(34, 14), new THREE.MeshBasicMaterial({ map: radial('rgba(255,236,210,.35)', 'rgba(255,236,210,0)'), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false }));
+  spill.rotation.x = -Math.PI / 2;
+  spill.position.set(0, 0.016, 9);
   const board = new THREE.Group();
   board.position.set(-19, 0, 4);
   board.rotation.y = 0.35;
@@ -208,7 +311,7 @@ function buildShowroom(scene, metal, joeyTex) {
   const ring = new THREE.Mesh(new THREE.BoxGeometry(5.5, 0.07, 0.05), glow(ACCENT, 2.2));
   ring.position.set(0, 8.08, 0.02);
   board.add(back, face, cap, ring);
-  g.add(glass, fascia, led, name, board);
+  g.add(glass, fascia, led, name, spill, board);
   scene.add(g);
 }
 
@@ -228,7 +331,6 @@ function buildSky(scene) {
   const horizon = new THREE.Mesh(new THREE.PlaneGeometry(900, 70), new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, fog: false }));
   horizon.position.set(SHOWROOM_X / 2, 22, -110);
   scene.add(horizon);
-
   const stars = new THREE.BufferGeometry();
   const pts = [];
   for (let i = 0; i < 900; i++) pts.push((Math.random() - 0.3) * 900, 40 + Math.random() * 160, -140 - Math.random() * 120);
@@ -237,20 +339,18 @@ function buildSky(scene) {
 }
 
 function buildDust(scene) {
-  const n = 2600;
+  const n = 2200;
   const geo = new THREE.BufferGeometry();
   const pos = new Float32Array(n * 3), seed = new Float32Array(n);
   for (let i = 0; i < n; i++) {
     pos[i * 3] = -20 + Math.random() * (SHOWROOM_X + 40);
     pos[i * 3 + 1] = Math.random() * 10;
-    pos[i * 3 + 2] = -14 + Math.random() * 26;
+    pos[i * 3 + 2] = -16 + Math.random() * 34;
     seed[i] = Math.random();
   }
   geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  const dot = canvasTex(64, 64, (g) => { const r = g.createRadialGradient(32, 32, 0, 32, 32, 32); r.addColorStop(0, 'rgba(255,220,180,1)'); r.addColorStop(1, 'rgba(255,220,180,0)'); g.fillStyle = r; g.fillRect(0, 0, 64, 64); });
-  const mat = new THREE.PointsMaterial({ map: dot, size: 0.09, transparent: true, opacity: 0.55, depthWrite: false, blending: THREE.AdditiveBlending, color: 0xffd7b0 });
-  const pts = new THREE.Points(geo, mat);
-  scene.add(pts);
+  const mat = new THREE.PointsMaterial({ map: radial('rgba(235,242,255,1)', 'rgba(235,242,255,0)'), size: 0.07, transparent: true, opacity: 0.5, depthWrite: false, blending: THREE.AdditiveBlending });
+  scene.add(new THREE.Points(geo, mat));
   return (time) => {
     const a = geo.attributes.position.array;
     for (let i = 0; i < n; i++) {
@@ -264,18 +364,21 @@ function buildDust(scene) {
 
 export async function buildLot({ scene, manager, isLow }) {
   scene.background = new THREE.Color('#05080f');
-  scene.fog = new THREE.FogExp2('#05080f', 0.0105);
-  scene.add(new THREE.HemisphereLight(0x8fb4ff, 0x0a0c12, 0.55));
+  scene.fog = new THREE.FogExp2('#070b14', 0.0095);
+  scene.add(new THREE.HemisphereLight(0xb4ccff, 0x1a1e28, 1.25));
 
   const loader = new THREE.TextureLoader(manager);
   const load = (url) => new Promise((res) => loader.load(url, (t) => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; res(t); }, undefined, () => res(null)));
-  const [heroes, joeyTex] = await Promise.all([Promise.all(CARS.map((c) => load(c.photos[c.hero]))), load('img/joey.jpg')]);
+  const [cutouts, joeyTex] = await Promise.all([Promise.all(CARS.map((c) => load(c.cutout))), load('img/joey.jpg')]);
 
-  const metal = new THREE.MeshStandardMaterial({ color: 0x1b2232, metalness: 0.55, roughness: 0.4 });
-  const haze = hazeMaterial(SODIUM.clone().multiplyScalar(0.9));
+  const metal = new THREE.MeshStandardMaterial({ color: 0x434955, metalness: 0.5, roughness: 0.45 });
+  const concrete = new THREE.MeshStandardMaterial({ color: 0x6f747e, roughness: 0.95 });
+  const shadowTex = radial('rgba(0,0,0,.78)', 'rgba(0,0,0,0)');
+  const poolTex = radial('rgba(225,236,255,.55)', 'rgba(225,236,255,0)');
+  const stallPoolTex = radial('rgba(244,248,255,.5)', 'rgba(244,248,255,0)');
 
   const ground = new THREE.Mesh(new THREE.PlaneGeometry(SHOWROOM_X + 400, 320), new THREE.MeshStandardMaterial({
-    map: asphalt(), color: 0x9aa3b4, roughness: 0.38, metalness: 0.25, transparent: true, opacity: 0.86,
+    map: asphalt(), color: 0xbcc4d4, roughness: 0.32, metalness: 0.3, transparent: true, opacity: 0.86,
   }));
   ground.material.map.wrapS = ground.material.map.wrapT = THREE.RepeatWrapping;
   ground.material.map.repeat.set(140, 40);
@@ -285,50 +388,56 @@ export async function buildLot({ scene, manager, isLow }) {
 
   const road = new THREE.Mesh(new THREE.PlaneGeometry(SHOWROOM_X + 400, 8), new THREE.MeshStandardMaterial({ color: 0x07090e, roughness: 0.6, transparent: true, opacity: 0.55 }));
   road.rotation.x = -Math.PI / 2;
-  road.position.set(SHOWROOM_X / 2, 0.006, 4);
+  road.position.set(SHOWROOM_X / 2, 0.006, 8);
   scene.add(road);
   const dashMat = new THREE.MeshBasicMaterial({ color: 0xffc56b, transparent: true, opacity: 0.45 });
   for (let x = -40; x < SHOWROOM_X + 60; x += 7) {
     const d = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 0.14), dashMat);
     d.rotation.x = -Math.PI / 2;
-    d.position.set(x, 0.01, 4);
+    d.position.set(x, 0.01, 8);
     scene.add(d);
   }
 
-  const bays = CARS.map((car, i) => {
-    const b = buildBay(i, car, heroes[i], metal, haze);
-    scene.add(b.bay);
-    return b;
+  const stalls = CARS.map((car, i) => {
+    const s = buildStall(i, car, cutouts[i], shadowTex, stallPoolTex);
+    scene.add(s.group);
+    return s;
   });
-  buildGate(scene, metal, haze);
+  buildRowFurniture(scene, metal, concrete);
+  const tops = buildPoles(scene, metal, poolTex);
+  const flutter = buildPennants(scene, tops);
+  buildGate(scene, metal);
   buildShowroom(scene, metal, joeyTex);
   buildSky(scene);
   const dust = isLow ? () => {} : buildDust(scene);
 
-  // A warm key light and an accent light follow the active bay.
-  const key = new THREE.SpotLight(0xffd2a0, 900, 40, 0.62, 0.65, 1.7);
-  key.position.set(bayX(0) + 3, 11, 4);
+  // A bright key light follows the active stall.
+  const key = new THREE.SpotLight(0xf2f6ff, 2600, 40, 0.85, 0.8, 1.5);
+  key.position.set(bayX(0) + 2, 9.5, BAY_Z + 5);
   scene.add(key, key.target);
-  const accent = new THREE.PointLight(ACCENT, 0, 16, 1.6);
-  scene.add(accent);
 
-  const picks = bays.map((b) => b.photo);
+  const white = new THREE.Color(1, 1, 1), dim = new THREE.Color(0x8f949f);
+  const c = new THREE.Color();
   let kx = bayX(0);
   return {
-    bays, picks,
+    stalls,
+    picks: stalls.map((s) => s.car),
+    hotspot: (i, out) => out.set(stalls[i].x + 1.6, stalls[i].baseTagY + 0.55, BAY_Z),
     update(dt, time, p, stopIdx, activeK) {
       dust(time);
+      flutter(time);
       const s = STOPS[stopIdx];
-      const tx = s.anchor[0];
-      kx += (tx - kx) * Math.min(1, dt * 2.5);
-      key.position.set(kx + 3, 11, 4);
-      key.target.position.set(kx, 0, BAY_Z + 2);
-      accent.position.set(kx, 1.4, BAY_Z + 3.2);
-      accent.intensity = s.car ? 30 * activeK : 0;
-      bays.forEach((b, i) => {
-        const on = s.car && s.index === i;
-        b.tag.position.y = b.baseTagY + Math.sin(time * 1.3 + i) * 0.12;
-        b.ledMat.color.copy(ACCENT).multiplyScalar(on ? 2.6 + Math.sin(time * 3) * 0.4 : 1.2);
+      kx += (s.anchor[0] - kx) * Math.min(1, dt * 2.5);
+      key.position.set(kx + 2, 9.5, BAY_Z + 5);
+      key.target.position.set(kx, 0, BAY_Z);
+      const k = Math.min(1, dt * 4);
+      stalls.forEach((st, i) => {
+        const on = s.car && s.index === i ? activeK : 0;
+        st.tag.position.y = st.baseTagY + Math.sin(time * 1.3 + i) * 0.06;
+        st.tagMat.opacity += ((0.32 + 0.68 * on) - st.tagMat.opacity) * k;
+        st.underline.visible = on > 0.5;
+        st.carMat.color.lerp(c.copy(dim).lerp(white, on), k);
+        st.poolMat.opacity += ((0.45 + 0.55 * on) - st.poolMat.opacity) * k;
       });
     },
   };

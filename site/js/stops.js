@@ -5,7 +5,7 @@
 //   anchor     world position of the stop (metres)
 //   cam        camera keys [t, position, look-at], t is 0..1 inside the range
 export const CARS = window.CARS.cars;
-export const BAY_GAP = 26;
+export const BAY_GAP = 7;
 export const BAY_Z = -9;
 export const bayX = (i) => 34 + i * BAY_GAP;
 export const SHOWROOM_X = bayX(CARS.length - 1) + 40;
@@ -16,14 +16,14 @@ const per = (1 - 2 * ENDS) / CARS.length;
 export const STOPS = [
   {
     id: 'home', label: 'THE LOT', start: 0, end: ENDS, holdT: 0.3, anchor: [0, 0, 0],
-    cam: [[0, [-20, 4.6, 26], [10, 4.4, -6]], [0.3, [-14, 3.4, 20], [14, 4.0, -7]], [1, [bayX(0) - 16, 2.9, 12.5], [bayX(0) - 2, 4.4, BAY_Z]]],
+    cam: [[0, [-20, 4.6, 26], [10, 4.4, -6]], [0.3, [-14, 3.4, 20], [14, 4.0, -7]], [1, [bayX(0) - 8, 3.1, 9], [bayX(0) - 1.2, 1.9, BAY_Z]]],
   },
   ...CARS.map((car, i) => {
     const x = bayX(i);
     return {
       id: car.id, car, index: i, label: `${car.model} ${car.trim}`.toUpperCase(),
       start: ENDS + i * per, end: ENDS + (i + 1) * per, holdT: 0.5, anchor: [x, 0, BAY_Z],
-      cam: [[0.12, [x - 12, 2.8, 12], [x - 1.5, 4.4, BAY_Z]], [0.5, [x + 1.2, 2.7, 9.8], [x + 0.6, 4.7, BAY_Z]], [0.88, [x + 12, 2.9, 11.5], [x + 3, 4.4, BAY_Z]]],
+      cam: [[0.12, [x - 3.8, 3.0, 8.4], [x - 0.8, 1.8, BAY_Z]], [0.5, [x + 0.5, 2.9, 7.4], [x + 0.4, 1.9, BAY_Z]], [0.88, [x + 3.8, 3.0, 8.2], [x + 1.0, 1.8, BAY_Z]]],
     };
   }),
   {

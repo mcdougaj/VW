@@ -182,7 +182,7 @@ async function boot() {
     const s = STOPS[idx];
     const hk = s.car ? a * (1 - detailK) : 0;
     if (hk > 0.02) {
-      v.set(s.anchor[0] + 4.0, 7.1, s.anchor[2]).project(camera);
+      lot.hotspot(s.index, v).project(camera);
       hot.style.transform = `translate(${(v.x * 0.5 + 0.5) * innerWidth}px, ${(-v.y * 0.5 + 0.5) * innerHeight}px)`;
       hot.lastChild.textContent = s.car.video ? 'Video & highlights' : 'Photos & highlights';
     }

@@ -68,6 +68,8 @@ for (const l of src.listings) {
     exterior: l.exterior, allNew: !!l.allNew, accent: l.accent || "#FF6A1A",
     total, discounts, ifQualify, highlights,
     hero: (l.hero || 2) - 1, photos, video, poster,
+    // the car cut out of its hero photo for the 3D lot (tools/cutout_cars.py); falls back to the hero photo
+    cutout: fs.existsSync(path.join(dir, "cutout.webp")) ? `cars/${l.id}/cutout.webp` : photos[(l.hero || 2) - 1],
   });
   console.log(`${l.id.padEnd(42)} ${usd(total).padStart(7)} off  ${photos.length} photos${video ? "  + video" : ""}`);
 }
