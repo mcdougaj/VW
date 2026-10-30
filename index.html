@@ -78,7 +78,13 @@
     <p class="eyebrow" id="detail-eyebrow"></p>
     <h2 id="detail-h"></h2>
     <div class="detail-media" id="detail-media"></div>
-    <div class="gallery" id="detail-gallery"></div>
+    <div class="gallery" id="detail-gallery">
+      <div class="gallery-track" id="gallery-track" tabindex="0" role="region" aria-roledescription="carousel" aria-label="Car photos. Swipe, drag or use the arrow keys."></div>
+      <button class="gallery-nav prev" id="gallery-prev" type="button" aria-label="Previous photo">‹</button>
+      <button class="gallery-nav next" id="gallery-next" type="button" aria-label="Next photo">›</button>
+      <span class="gallery-count" id="gallery-count" aria-live="polite"></span>
+      <span class="soon" id="gallery-soon" hidden>VIDEO COMING SOON</span>
+    </div>
     <h3>Savings off MSRP</h3>
     <div class="stack" id="detail-stack"></div>
     <div id="detail-qualify"></div>
@@ -90,11 +96,6 @@
     </div>
     <p class="fine" id="detail-fine"></p>
   </aside>
-
-  <dialog class="viewer" id="viewer" aria-label="Photo">
-    <button class="detail-close" id="viewer-close" type="button">Close</button>
-    <img id="viewer-img" alt="">
-  </dialog>
 
   <div class="hud" aria-hidden="true">
     <span id="hud-label">01 / THE LOT</span>

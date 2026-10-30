@@ -140,12 +140,19 @@ body.moved .hud-hint { opacity: 0; }
 .detail-close:hover { border-color: var(--accent); color: var(--accent); }
 .detail-media { position: relative; aspect-ratio: 9 / 16; max-height: 62vh; margin: 0 auto 12px; background: #000; border: 1px solid var(--line); }
 .detail-media video, .detail-media img { width: 100%; height: 100%; object-fit: contain; display: block; background: #000; }
-.detail-media.photo { aspect-ratio: 4 / 3; }
-.detail-media .soon { position: absolute; left: 10px; top: 10px; padding: 5px 9px; background: rgba(5, 8, 15, .8); border-left: 2px solid var(--cyan); font: 500 .62rem var(--mono); letter-spacing: .14em; }
-.gallery { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-.gallery button { padding: 0; border: 1px solid var(--line); background: #0b111d; cursor: zoom-in; aspect-ratio: 4 / 3; overflow: hidden; }
-.gallery button:hover { border-color: var(--accent); }
-.gallery img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.soon { position: absolute; left: 10px; top: 10px; padding: 5px 9px; background: rgba(5, 8, 15, .8); border-left: 2px solid var(--cyan); font: 500 .62rem var(--mono); letter-spacing: .14em; pointer-events: none; }
+.gallery { position: relative; margin: 0 0 4px; }
+.gallery-track { display: flex; aspect-ratio: 4 / 3; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none;
+  background: #000; border: 1px solid var(--line); cursor: grab; touch-action: pan-x pan-y; }
+.gallery-track::-webkit-scrollbar { display: none; }
+.gallery-track.dragging { cursor: grabbing; scroll-snap-type: none; }
+.gallery-track img { flex: 0 0 100%; width: 100%; height: 100%; object-fit: cover; scroll-snap-align: center; scroll-snap-stop: always; user-select: none; -webkit-user-drag: none; }
+.gallery-nav { position: absolute; top: 50%; width: 40px; height: 40px; margin-top: -20px; border: 1px solid var(--line); border-radius: 50%; background: rgba(5, 8, 15, .65);
+  backdrop-filter: blur(4px); font-size: 1.4rem; line-height: 1; cursor: pointer; transition: border-color .2s, color .2s; }
+.gallery-nav:hover { border-color: var(--accent); color: var(--accent); }
+.gallery-nav.prev { left: 10px; }
+.gallery-nav.next { right: 10px; }
+.gallery-count { position: absolute; right: 10px; bottom: 10px; padding: 4px 8px; background: rgba(5, 8, 15, .75); font: 500 .62rem var(--mono); letter-spacing: .14em; pointer-events: none; }
 .stack .row { margin: 0 0 12px; }
 .stack .row div:first-child { display: flex; justify-content: space-between; align-items: baseline; font: 500 .7rem var(--mono); letter-spacing: .1em; color: var(--muted); text-transform: uppercase; }
 .stack .row div:first-child b { font: 700 1.3rem var(--sans); color: var(--ink); letter-spacing: 0; }
@@ -163,11 +170,6 @@ body.moved .hud-hint { opacity: 0; }
 .spec { list-style: none; margin: 0 0 20px; padding: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
 .spec li { padding: 8px 10px; border-left: 2px solid var(--accent); background: rgba(255, 255, 255, .04); font: 500 .8rem var(--sans); }
 .fine { margin: 6px 0 0; font: 500 .62rem/1.6 var(--mono); color: var(--muted); }
-
-/* ---------- photo viewer ---------- */
-.viewer { width: min(96vw, 1000px); padding: 14px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
-.viewer::backdrop { background: rgba(2, 4, 8, .85); }
-.viewer img { display: block; width: 100%; height: auto; margin-top: 10px; }
 
 /* ---------- phones ---------- */
 @media (max-width: 760px) {

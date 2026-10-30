@@ -75,29 +75,55 @@ export function buildCarousel(go) {
 export function createDetail({ onOpen, onClose }) {
   const panel = document.getElementById('detail');
   const media = document.getElementById('detail-media');
-  const viewer = document.getElementById('viewer');
-  const viewerImg = document.getElementById('viewer-img');
+  const track = document.getElementById('gallery-track');
+  const count = document.getElementById('gallery-count');
+  const soon = document.getElementById('gallery-soon');
   let openId = null;
 
-  const showPhoto = (src, alt) => { viewerImg.src = src; viewerImg.alt = alt; viewer.showModal(); };
-  document.getElementById('viewer-close').addEventListener('click', () => viewer.close());
-  viewer.addEventListener('close', () => viewerImg.removeAttribute('src'));
+  // Swipeable photo strip: native touch/trackpad scrolling with snap, plus arrows, keys and mouse drag.
+  const at = () => Math.round(track.scrollLeft / Math.max(1, track.clientWidth));
+  const goPhoto = (i) => {
+    const n = track.children.length;
+    track.scrollTo({ left: ((i + n) % n) * track.clientWidth, behavior: 'smooth' });
+  };
+  function updateCount() { count.textContent = `${at() + 1} / ${track.children.length}`; }
+  track.addEventListener('scroll', () => requestAnimationFrame(updateCount), { passive: true });
+  document.getElementById('gallery-prev').addEventListener('click', () => goPhoto(at() - 1));
+  document.getElementById('gallery-next').addEventListener('click', () => goPhoto(at() + 1));
+  track.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); e.stopPropagation(); goPhoto(at() + (e.key === 'ArrowRight' ? 1 : -1)); }
+  });
+  let drag = null;
+  track.addEventListener('pointerdown', (e) => {
+    if (e.pointerType !== 'mouse') return;   // touch already swipes natively
+    drag = { x: e.clientX, left: track.scrollLeft };
+    track.setPointerCapture(e.pointerId);
+    track.classList.add('dragging');
+  });
+  track.addEventListener('pointermove', (e) => { if (drag) track.scrollLeft = drag.left - (e.clientX - drag.x); });
+  const endDrag = (e) => {
+    if (!drag) return;
+    const moved = e.clientX - drag.x;
+    const from = Math.round(drag.left / track.clientWidth);
+    drag = null;
+    track.classList.remove('dragging');
+    goPhoto(Math.abs(moved) > 40 ? from + (moved < 0 ? 1 : -1) : from);
+  };
+  track.addEventListener('pointerup', endDrag);
+  track.addEventListener('pointercancel', endDrag);
 
   function fill(c) {
     document.getElementById('detail-eyebrow').textContent = `${c.year} VOLKSWAGEN · STOCK ${c.stock}`;
     document.getElementById('detail-h').textContent = `${c.model} ${c.trim}`;
     media.replaceChildren();
-    media.classList.toggle('photo', !c.video);
-    if (c.video) {
-      media.append(el('video', { src: c.video, poster: c.poster || c.photos[c.hero], controls: true, playsInline: true, preload: 'metadata' }));
-    } else {
-      media.append(el('img', { src: c.photos[c.hero], alt: name(c) }), el('span', { class: 'soon', text: 'VIDEO COMING SOON' }));
-    }
-    document.getElementById('detail-gallery').replaceChildren(...c.photos.map((src, i) => {
-      const b = el('button', { type: 'button', ariaLabel: `Photo ${i + 1} of ${c.photos.length}` }, el('img', { src, alt: '', loading: 'lazy' }));
-      b.addEventListener('click', () => showPhoto(src, `${name(c)}, photo ${i + 1}`));
-      return b;
-    }));
+    media.hidden = !c.video;
+    if (c.video) media.append(el('video', { src: c.video, poster: c.poster || c.photos[c.hero], controls: true, playsInline: true, preload: 'metadata' }));
+    // photos scroll in place (swipe, drag, arrows), hero first
+    const order = [c.hero, ...c.photos.map((_, i) => i).filter((i) => i !== c.hero)];
+    track.replaceChildren(...order.map((i, n) => el('img', { src: c.photos[i], alt: `${name(c)}, photo ${n + 1} of ${order.length}`, loading: n ? 'lazy' : 'eager', draggable: false })));
+    track.scrollLeft = 0;
+    soon.hidden = !!c.video;
+    updateCount();
     const max = Math.max(...c.discounts.map((d) => d.amount));
     document.getElementById('detail-stack').replaceChildren(
       ...c.discounts.map((d) => {
@@ -137,7 +163,7 @@ export function createDetail({ onOpen, onClose }) {
     onClose();
   }
   document.getElementById('detail-close').addEventListener('click', close);
-  addEventListener('keydown', (e) => { if (e.key === 'Escape' && openId && !viewer.open) close(); });
+  addEventListener('keydown', (e) => { if (e.key === 'Escape' && openId) close(); });
   document.addEventListener('click', (e) => {
     const b = e.target.closest && e.target.closest('[data-detail]');
     if (b) open(b.getAttribute('data-detail'));
