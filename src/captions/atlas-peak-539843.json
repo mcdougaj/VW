@@ -1,0 +1,16 @@
+{
+  "note": "Voiceover script for Joey + caption timing (frames @30fps). Timing is estimated until the real VO is recorded; nudge 'from'/'to' to match your read.",
+  "lines": [
+    { "from": 2,   "to": 44,  "text": "Sixty-six fifteen off.", "show": "$6,615 OFF." },
+    { "from": 48,  "to": 112, "text": "This is the 2026 Atlas Peak Edition.", "show": "This is the 2026 Atlas Peak Edition." },
+    { "from": 116, "to": 176, "text": "Right here at Midlands VW.", "show": "Right here at Midlands VW." },
+    { "from": 184, "to": 266, "text": "Seven seats, all-wheel drive, panoramic roof, tows five thousand pounds.", "show": "7 seats. AWD. Panoramic roof. Tows 5,000 lbs." },
+    { "from": 270, "to": 352, "text": "And that orange-stitch interior.", "show": "And that orange-stitch interior." },
+    { "from": 372, "to": 470, "text": "Sixteen-fifteen dealer discount.", "show": "$1,615 dealer discount." },
+    { "from": 474, "to": 560, "text": "Plus a five thousand dollar retail customer bonus.", "show": "PLUS a $5,000 retail customer bonus." },
+    { "from": 566, "to": 598, "text": "Sixty-six fifteen off MSRP.", "show": "$6,615 off MSRP." },
+    { "from": 606, "to": 716, "text": "Military or first responder? Take another five hundred off.", "show": "Military or first responder? Another $500 off." },
+    { "from": 724, "to": 784, "text": "I'm Joey McDougal, sales manager at Midlands VW.", "show": "I'm Joey McDougal, sales manager at Midlands VW." },
+    { "from": 788, "to": 838, "text": "Call me, or scan the code.", "show": "Call me, or scan the code." }
+  ]
+}

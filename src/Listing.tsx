@@ -4,6 +4,7 @@ import { C, FONT, T, BEAT } from "./theme";
 import { clamp, ease, flash, shake, slam, soft } from "./motion";
 import { Grain, LightSweep, PhotoSlot, QR, Vignette } from "./parts";
 import { ListingProps, total, usd } from "./data";
+import { Captions, CaptionLine } from "./Captions";
 
 const txt = (size: number, weight = 900, extra: React.CSSProperties = {}): React.CSSProperties => ({
   fontFamily: FONT, fontSize: size, fontWeight: weight, color: C.ink, lineHeight: 1, letterSpacing: -1, ...extra,
@@ -30,7 +31,7 @@ const Hook: React.FC<{ l: ListingProps }> = ({ l }) => {
         </div>
         <div style={{ ...txt(54, 700, { letterSpacing: 12, color: C.dim }), marginTop: 26, opacity: soft(f, 6, 8) }}>OFF MSRP</div>
       </div>
-      <div style={{ ...center, top: 1330, ...txt(46, 700, { letterSpacing: 4 }), opacity: soft(f, 12, 10) }}>
+      <div style={{ ...center, top: 1250, ...txt(46, 700, { letterSpacing: 4 }), opacity: soft(f, 12, 10) }}>
         {l.year} {l.model.toUpperCase()} {l.trim.toUpperCase()}
       </div>
       <Flash at={0} />
@@ -45,10 +46,10 @@ const Reveal: React.FC<{ l: ListingProps }> = ({ l }) => {
   const words = [`${l.year}`, l.model.toUpperCase(), l.trim.toUpperCase()];
   return (
     <AbsoluteFill style={{ transform: `translateX(${inn * 1080}px)`, filter: `blur(${inn * 30}px)` }}>
-      <PhotoSlot src={l.photos[0]} label="exterior 3/4 front" from={0} dur={135} zoom={[1.18, 1.05]} drift={[40, -40]} />
+      <PhotoSlot src={l.photos[0]} label="exterior 3/4 front" from={0} dur={135} zoom={[1.3, 1.16]} drift={[24, -24]} band bandY={560} />
       <LightSweep at={25} /><LightSweep at={95} dur={30} />
-      <AbsoluteFill style={{ background: "linear-gradient(180deg, transparent 50%, rgba(7,9,15,0.92) 82%)" }} />
-      <div style={{ position: "absolute", left: 80, right: 80, top: 1180 }}>
+      <AbsoluteFill style={{ background: "linear-gradient(180deg, transparent 46%, rgba(7,9,15,0.92) 72%)" }} />
+      <div style={{ position: "absolute", left: 80, right: 80, top: 930 }}>
         {words.map((w, i) => {
           const p = slam(f, 15 + i * BEAT);
           return (
@@ -109,14 +110,14 @@ const Savings: React.FC<{ l: ListingProps }> = ({ l }) => {
         backgroundImage: `linear-gradient(${C.line} 1px, transparent 1px), linear-gradient(90deg, ${C.line} 1px, transparent 1px)`,
         transform: `translateY(${-f * 0.6}px)`,
       }} />
-      <div style={{ ...center, top: 400, ...txt(64, 900, { letterSpacing: 16 }), transform: `scale(${1.6 - 0.6 * slam(f, 0)})` }}>
+      <div style={{ ...center, top: 330, ...txt(64, 900, { letterSpacing: 16 }), transform: `scale(${1.6 - 0.6 * slam(f, 0)})` }}>
         YOUR SAVINGS
       </div>
       {l.discounts.map((d, i) => {
         const at = 30 + i * 60; const p = slam(f, at); const w = ease(f, at + 4, at + 26);
         return (
           <div key={d.label} style={{
-            position: "absolute", left: 90, right: 90, top: 600 + i * 200,
+            position: "absolute", left: 90, right: 90, top: 520 + i * 200,
             transform: `translateY(${(1 - p) * -260}px)`, opacity: Math.min(1, p * 3),
           }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
@@ -133,10 +134,10 @@ const Savings: React.FC<{ l: ListingProps }> = ({ l }) => {
         );
       })}
       <div style={{
-        position: "absolute", left: 90, right: 90, top: 600 + l.discounts.length * 200 + 10, height: 4,
+        position: "absolute", left: 90, right: 90, top: 520 + l.discounts.length * 200 + 10, height: 4,
         background: C.ink, opacity: 0.6, transformOrigin: "left", transform: `scaleX(${ease(f, countStart - 10, countStart + 8)})`,
       }} />
-      <div style={{ ...center, top: 650 + l.discounts.length * 200, opacity: ease(f, countStart - 6, countStart + 4) }}>
+      <div style={{ ...center, top: 570 + l.discounts.length * 200, opacity: ease(f, countStart - 6, countStart + 4) }}>
         <div style={txt(44, 700, { letterSpacing: 12, color: C.accent })}>TOTAL SAVINGS</div>
         <div style={{
           ...txt(230, 900, { letterSpacing: -8 }), marginTop: 14,
@@ -213,8 +214,8 @@ const Cta: React.FC<{ l: ListingProps }> = ({ l }) => {
           ...txt(64, 900, { letterSpacing: 1 }), transform: `scale(${slam(f, 2 * BEAT)})`,
         }}>{l.phone}</div>
       </div>
-      <div style={{ ...center, top: 1110, transform: `scale(${slam(f, 3 * BEAT)})` }}>
-        <QR text={l.url} size={300} />
+      <div style={{ ...center, top: 1040, transform: `scale(${slam(f, 3 * BEAT)})` }}>
+        <QR text={l.url} size={260} />
         <div style={{ ...txt(34, 700, { color: C.dim, letterSpacing: 2 }), marginTop: 16 }}>
           SCAN TO SEE THIS {l.model.toUpperCase()}
         </div>
@@ -243,14 +244,14 @@ const EndCard: React.FC<{ l: ListingProps }> = ({ l }) => {
       }}>
         Savings shown are off MSRP as listed on midlandsvw.com as of {l.asOf} for stock #{l.stock} (VIN {l.vin}).
         Total savings = {l.discounts.map((d) => `${d.label} ${usd(d.amount)}`).join(" + ")}.{qual} Retail Customer
-        Bonus subject to program terms and end dates. Excludes tax, tag, title and dealer fees. Subject to prior
+        Bonus subject to program terms{l.bonusEnds ? `; ends ${l.bonusEnds}` : " and end dates"}. Excludes tax, tag, title and dealer fees. Subject to prior
         sale. See dealer for complete details.
       </div>
     </AbsoluteFill>
   );
 };
 
-export const Listing: React.FC<ListingProps> = (l) => (
+export const Listing: React.FC<ListingProps & { captionLines?: CaptionLine[] }> = ({ captionLines = [], ...l }) => (
   <AbsoluteFill style={{ background: C.bg }}>
     <Audio src={staticFile("beat.wav")} />
     <Sequence from={T.hook} durationInFrames={T.reveal}><Hook l={l} /></Sequence>
@@ -261,6 +262,7 @@ export const Listing: React.FC<ListingProps> = (l) => (
     <Sequence from={T.cta} durationInFrames={T.end - T.cta}><Cta l={l} /></Sequence>
     <Sequence from={T.end} durationInFrames={T.out - T.end}><EndCard l={l} /></Sequence>
     <Vignette />
+    {l.captions && <Captions lines={captionLines} />}
     <Grain />
   </AbsoluteFill>
 );
