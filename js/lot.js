@@ -1,5 +1,5 @@
-import * as THREE from '../vendor/three/build/three.module.min.js';
-import { CARS, STOPS, BAY_Z, BAY_GAP, bayX, SHOWROOM_X, usd } from './stops.js';
+import * as THREE from '../vendor/three/build/three.module.min.js?v=45891da-mvu89vzw';
+import { CARS, STOPS, BAY_Z, BAY_GAP, bayX, SHOWROOM_X, usd } from './stops.js?v=45891da-mvu89vzw';
 
 // The dealership lot at night: a front display row of parking stalls, each holding the REAL car cut out
 // of its own listing photo (tools/cutout_cars.py; never a drawn car), tall LED pole lights with light

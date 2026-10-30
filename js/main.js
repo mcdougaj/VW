@@ -1,9 +1,9 @@
-import * as THREE from '../vendor/three/build/three.module.min.js';
-import { STOPS, CARS, stopIndexAt, stopIndex, activity, clamp01 } from './stops.js';
-import { createScroll } from './scroll.js';
-import { buildLot } from './lot.js';
-import { createPost } from './post.js';
-import { buildChapters, buildCarousel, createDetail } from './ui.js';
+import * as THREE from '../vendor/three/build/three.module.min.js?v=45891da-mvu89vzw';
+import { STOPS, CARS, stopIndexAt, stopIndex, activity, clamp01 } from './stops.js?v=45891da-mvu89vzw';
+import { createScroll } from './scroll.js?v=45891da-mvu89vzw';
+import { buildLot } from './lot.js?v=45891da-mvu89vzw';
+import { createPost } from './post.js?v=45891da-mvu89vzw';
+import { buildChapters, buildCarousel, createDetail } from './ui.js?v=45891da-mvu89vzw';
 
 const html = document.documentElement;
 const params = new URLSearchParams(location.search);

@@ -1,4 +1,4 @@
-import { STOPS, clamp01 } from './stops.js';
+import { STOPS, clamp01 } from './stops.js?v=45891da-mvu89vzw';
 
 // Virtual scroll (same feel as joeyi.org): wheel, touch and keys move a target progress 0..1; value eases toward it.
 export function createScroll(initial = 0) {

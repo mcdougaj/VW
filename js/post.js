@@ -1,10 +1,10 @@
 // Post chain adapted from joeyi.org (js/post.js): bloom, then grain, chromatic fringe, vignette and grade.
-import * as THREE from '../vendor/three/build/three.module.min.js';
-import { EffectComposer } from '../vendor/three/addons/postprocessing/EffectComposer.js';
-import { RenderPass } from '../vendor/three/addons/postprocessing/RenderPass.js';
-import { UnrealBloomPass } from '../vendor/three/addons/postprocessing/UnrealBloomPass.js';
-import { ShaderPass } from '../vendor/three/addons/postprocessing/ShaderPass.js';
-import { OutputPass } from '../vendor/three/addons/postprocessing/OutputPass.js';
+import * as THREE from '../vendor/three/build/three.module.min.js?v=45891da-mvu89vzw';
+import { EffectComposer } from '../vendor/three/addons/postprocessing/EffectComposer.js?v=45891da-mvu89vzw';
+import { RenderPass } from '../vendor/three/addons/postprocessing/RenderPass.js?v=45891da-mvu89vzw';
+import { UnrealBloomPass } from '../vendor/three/addons/postprocessing/UnrealBloomPass.js?v=45891da-mvu89vzw';
+import { ShaderPass } from '../vendor/three/addons/postprocessing/ShaderPass.js?v=45891da-mvu89vzw';
+import { OutputPass } from '../vendor/three/addons/postprocessing/OutputPass.js?v=45891da-mvu89vzw';
 
 // Runs after tone mapping, in display space: chromatic fringe, vignette, grade, film grain.
 const FinalShader = {
